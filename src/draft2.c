@@ -51,8 +51,8 @@ typedef void (* funcaoEstado)(char ch, informacoes *token);
 funcaoEstado estados[] = { q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, estadoFinal, estadoErro };
 int estadoAtual;
 void mudaEstado(int novoEstado);
-void processaEspacoFinal(char espaco, char token, informacoes* info);
-void consomeEspacos(char espaco);
+void processaEspacoEmEstadoFinal(char espaco, char token, informacoes* info);
+void consomeEspacos(char espaco, informacoes* token);
 void analiseLexica(FILE *fp);    
     
 
@@ -168,6 +168,7 @@ void q9 (char analisado,  informacoes *token) {
     if(isspace(analisado))
     {
         estadoAtual = 9;
+        consomeEspacos(analisado, token);
         return;
     }
     
@@ -330,25 +331,23 @@ void mudaEstado(int novoEstado)
     estadoAtual = novoEstado;
 }
 
-void finalisaAnalise(char* token, informacoes* info;)
-{
-    setTokenValue(token, info);
-    mudaEstado(ESTADO_FINAL);
-}
 
-void consomeEspacos(char espaco)
+void consomeEspacos(char espaco, informacoes* token)
 {
     if(ch == '\n')
     {
-        tokens->linha++;
-        tokens->coluna = 0;
+        token->linha++;
+        token->coluna = 0;
     } else {
-        tokens->coluna++;
+        token->coluna++;
     }
 }
 
-void void processaEspacoFinal(char espaco, char token, informacoes* info)
+void void processaEspacoEmEstadoFinal(char espaco, char token, informacoes* info)
 {
-    
+    consomeEspacos(espaco, info);
+    mudaEstado(ESTADO_FINAL);
+    setTokenValue(token, info);
+
 }
     

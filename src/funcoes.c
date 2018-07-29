@@ -3,14 +3,14 @@
 #include <stdlib.h>
 
 typedef struct informacoes {
-    char *token; 
-    char *lexema;
+    char token[255]; 
+    char lexema[255];
     int lexema_size;
     int linha;
     int coluna; 
     } informacoes;
 
-    void imprimeToken(informacoes token);
+void imprimeToken(informacoes token);
 void setTokenValue(informacoes* info, char* newValue);
 void setLexemaValue(informacoes* info, char* newLexema);
 void setLinhaValue(informacoes* info, int newLineNumber);
@@ -71,8 +71,9 @@ int main(int argc, char **argv) {
         exit(1);
     }
     else{
-        //analiseLexica(file_pointer);
+        
         printf("Pronto para iniciar a análise lexica de %s", fileDir);
+        analiseLexica(file_pointer);
     }
     
     return 0;
@@ -83,23 +84,34 @@ int main(int argc, char **argv) {
 }
 
 
-void analiseLexica(FILE *fp) {    
+void analiseLexica(FILE *fp) { 
+    
+    if(fp == NULL){
+        printf("Erro enquanto tentava ler o arquivo %s\n", fp);
+        exit(1);
+    }
+    
     char ch;
     informacoes var;
     int numeroDeTokens = 0;
+    printf("Iniciando analise lexica\n");
+    
     var.linha = 1;  // linhas são numeradas de 1 em diante.
     var.coluna = 1; // colunas são numeradas de 1 em diante.
     setTokenValue(&var, "NOVO_TOKEN"); // token no estado inicial.
-
+    printf("Iniciando while\n");
     while((ch = fgetc(fp)) != EOF)
     {
         // Executamos a função do Estado atual.
         // Exemplo: executamos q0(ch, var), ou q1(ch, var)
         // a função é definida pela variavel global estadoAtual;
+        printf("Chamado funcao de estados para o estado numero %d\n", estadoAtual);
+        
         estados[estadoAtual](ch, var);
         
     }
-    printf("Linhas %d e Colunas %d\n" ,var.linha, var.coluna);
+    printf("Linhas %d e Colunas %d\n" ,var.linha, var.coluna); 
+    /**/
 }
 
 int conta_vetor (char vet[] ){
@@ -113,36 +125,38 @@ void q9 (char ch, informacoes tokens){
     char vet[255];
     int i ;
     if(ch == '?'){
-        tokens.token = "?"; 
+    //    setTokenValue(tokens, "?"); 
         q0('=',tokens);
     }else if(ch == '#'){
-        tokens.token = "#"; 
+   //     setTokenValue(tokens, "#"); 
         q16('#',tokens);
         
     }else if(ch == '|'){
-      tokens.token = "|"; 
+    //  setTokenValue(tokens, "|"; 
         q8('|',tokens);
-    }else if(ch == '@'){
-      tokens.token = "@"; 
+    }else if(ch == '*'){ // 
+    //  setTokenValue(tokens, OPERADOR); 
         q12(' ',tokens);
-    }else if(ch == '&'){
-      tokens.token = "&"; 
-        q3(' ',tokens);
+    }else if(ch == '&'){ // Qualquer Caractere
+   //   setTokenValue(tokens, '&'); 
+ //       q3(' ',tokens);
     }else if(ch == '='||ch == '>'||ch == '<'){
         vet[0] = ch;
-        tokens.token = ""; 
-        tokens.token = vet; 
+    //    setTokenValue(tokens, ch) 
+  //      //tokens.token = vet; 
         q11(' ',tokens);
     }else if(ch == '/'||ch == '%'||ch == '['||ch == ']'||ch == '{'||ch == '}'||ch == ';'||ch == ','){
         vet[0] = ch;
-        tokens.token = ""; 
-        tokens.token = vet; 
+ //       //tokens.token = ""; 
+ //       //tokens.token = vet; 
         q10(' ', tokens);
     }else if(ch == '"'){
-        tokens.token = "\""; 
+       // //tokens.token = "\""; 
         // q10(' ', tokens);
         q2('g',tokens);
     }
+    
+    setLexemaValue(&tokens, &ch);
   
 }
 
@@ -153,8 +167,8 @@ void q0 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "=");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }
 
@@ -166,8 +180,8 @@ void q8 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "|");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }else{
       printf("erro carracrte: %c nao esperado",ch);
@@ -181,8 +195,8 @@ void q16 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "#");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }else if(ch != ' '){
           q10(' ', tokens);
@@ -198,8 +212,8 @@ void q12 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "@");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }else if(ch != ' '){
           q10(' ', tokens);
@@ -215,8 +229,8 @@ void q3 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "&");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }else if(ch == ' '){
         printf("espaço nao esperado");
@@ -232,8 +246,8 @@ void q11 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         // i =  conta_vetor(vet);
         strcat(vet, "=");
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q10(' ', tokens);
       }else if(ch == ' '){
           q10(' ', tokens);
@@ -252,8 +266,8 @@ void q2 (char ch, informacoes tokens){
       //   i =  conta_vetor(vet);
       //   vet[i+1] = ch ;
       //   // strcat(vet, "=");
-      //     tokens.token = ""; 
-      //     tokens.token = vet; 
+      //     //tokens.token = ""; 
+      //     //tokens.token = vet; 
       //     q1('a',tokens);
       // }else
        if(ch !='\\'||ch != '\'' ){
@@ -272,8 +286,8 @@ void q1 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         i =  conta_vetor(vet);
         vet[i+1] = ch ;
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q7('w',tokens);
       }else{
         printf("erro carracrte: %c nao esperado",ch);
@@ -289,23 +303,23 @@ void q7 (char ch, informacoes tokens){
         strcpy(vet,tokens.token);
         i =  conta_vetor(vet);
         vet[i+1] = ch ;
-          tokens.token = ""; 
-          tokens.token = vet; 
+          //tokens.token = ""; 
+          //tokens.token = vet; 
           q7('\'',tokens);
       }
       // }else if(ch == '\\'){
       //   strcpy(vet,tokens.token);
       //   i =  conta_vetor(vet);
       //   vet[i+1] = ch ;
-      //     tokens.token = ""; 
-      //     tokens.token = vet; 
+      //     //tokens.token = ""; 
+      //     //tokens.token = vet; 
       //     q1('\\',tokens);
       // }else if(ch == '"'){
       //   strcpy(vet,tokens.token);
       //   i =  conta_vetor(vet);
       //   vet[i+1] = ch ;
-      //     tokens.token = ""; 
-      //     tokens.token = vet; 
+      //     //tokens.token = ""; 
+      //     //tokens.token = vet; 
       //     q10(' ', tokens);
       // }else{
       //   printf("erro carracrte: %c nao esperado",ch);
